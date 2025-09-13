@@ -1,7 +1,21 @@
-import { Box, Flex, Button } from "@radix-ui/themes";
+import { Box, Flex, Button, DropdownMenu } from "@radix-ui/themes";
 import { Outlet, Link } from "react-router-dom";
+import { useContext } from "react";
+import { UserContext } from "../context/user.context";
+import { FaUserCircle } from "react-icons/fa";
+import { logout } from "../utils/firebase";
 
 function Navbar() {
+  const { currentUser } = useContext(UserContext);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("error signing out", error);
+    }
+  };
+
   return (
     <Box asChild>
       <nav>
@@ -9,14 +23,33 @@ function Navbar() {
           <Link to="/">Home</Link>
           <Link to="/about">About</Link>
 
-          <Flex align="center" gap="2">
-            <Button asChild variant="solid">
-              <Link to="/login">Login</Link>
-            </Button>
-            <Button asChild variant="solid">
-              <Link to="/signup">Sign up</Link>
-            </Button>
-          </Flex>
+          {currentUser ? (
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <Button aria-label="User menu">
+                  <FaUserCircle size={24} />
+                </Button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content>
+                <DropdownMenu.Item asChild>
+                  <Link to="/tutorials">My Tutorials</Link>
+                </DropdownMenu.Item>
+                <DropdownMenu.Separator />
+                <DropdownMenu.Item onSelect={handleLogout}>
+                  Logout
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
+          ) : (
+            <Flex align="center" gap="2">
+              <Button asChild>
+                <Link to="/login">Login</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/signup">Sign up</Link>
+              </Button>
+            </Flex>
+          )}
         </Flex>
         <Outlet />
       </nav>
