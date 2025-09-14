@@ -23,9 +23,6 @@ const validatePhoneNumber = (input) => {
   return null;
 };
 
-// very light email check; Firebase will also validate server-side
-const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s ?? "");
-
 const Signup = () => {
   const navigate = useNavigate();
 
@@ -63,6 +60,7 @@ const Signup = () => {
     if (!lastName.trim()) next.lastName = "Last name is required.";
 
     const emailTrim = email.trim().toLowerCase();
+    const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s ?? "");
     if (!emailTrim) next.email = "Email is required.";
     else if (!isEmail(emailTrim)) next.email = "Enter a valid email.";
 
