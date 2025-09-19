@@ -7,7 +7,8 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import TutorialsPage from "./routes/TutorialsPage.jsx";
 import AddTutorialPage from "./routes/AddTutorialPage.jsx";
-import MfaOtp from "./routes/MfaOtp";
+import VerifyEmail from "./components/VerifyEmail";
+import OtpPage from "./routes/OtpPage";
 
 function App() {
   return (
@@ -24,7 +25,8 @@ function App() {
           <Route path="new" element={<AddTutorialPage />} />
         </Route>
 
-        <Route path="mfa" element={<MfaOtp />} />
+        <Route path="verifyemail" element={<VerifyEmail />} />
+        <Route path="otp" element={<OtpPage />} />
       </Route>
     </Routes>
   );

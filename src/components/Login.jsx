@@ -4,7 +4,7 @@ import {
   signInWithGooglePopup,
   createUserDocFromAuth,
   signinAuthUserWithEmailAndPassword,
-} from "../utils/firebase";
+} from "@/utils/firebase";
 import { UserContext } from "../context/user.context";
 import { useNavigate } from "react-router-dom";
 

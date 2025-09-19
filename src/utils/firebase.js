@@ -1,4 +1,3 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
@@ -32,8 +31,6 @@ import {
   uploadBytes,
 } from "firebase/storage";
 import { getDownloadURL } from "firebase/storage";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -60,19 +57,24 @@ export const logout = () => signOut(auth);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-export const uploadThumbnail = async (file) => {
+export const uploadThumbnail = async (file, uid) => {
   if (!file) return null;
-  const fileRef = ref(storage, `thumbnails/${Date.now()}_${file.name}`);
+  const fileRef = ref(
+    storage,
+    `users/${uid}/thumbnails/${Date.now()}_${file.name}`
+  );
   const snap = await uploadBytes(fileRef, file);
   return getDownloadURL(snap.ref);
 };
 
-export const uploadVideo = async (file) => {
+export const uploadVideo = async (file, uid) => {
   if (!file) return;
-  const fileRef = ref(storage, `videos/${Date.now()}_${file.name}`);
+  const fileRef = ref(
+    storage,
+    `users/${uid}/videos/${Date.now()}_${file.name}`
+  );
   const task = uploadBytesResumable(fileRef, file);
 
-  // Await completion (or error) without wiring a progress handler
   await new Promise((resolve, reject) => {
     task.on("state_changed", undefined, reject, resolve);
   });
@@ -108,7 +110,6 @@ export const createTutorialDocFromData = async (tutorialData) => {
   return tutorialDocRef;
 };
 
-// get tutorial for a specific user
 export const fetchTutorialsByUser = async (uid) => {
   if (!uid) return {};
 
@@ -137,7 +138,6 @@ export const fetchTutorialsAndDocuments = async () => {
   return tutorialsMap;
 };
 
-// DELETE one tutorial by its document id
 export const deleteTutorialDocById = async (tutorialId) => {
   if (!tutorialId) return;
 
@@ -166,7 +166,6 @@ export const incrementTutorialViews = async (tutorialId) => {
   return tutorialDocRef;
 };
 
-// add a rating: +1 to ratingsCount, +stars to ratingsSum
 export const addTutorialRating = async (tutorialId, stars) => {
   if (!tutorialId) return;
 
@@ -191,8 +190,6 @@ export const createUserDocFromAuth = async (
   if (!userAuth) return;
 
   const userDocRef = doc(db, "users", userAuth.uid);
-  console.log;
-
   const userSnapshot = await getDoc(userDocRef);
 
   if (!userSnapshot.exists()) {

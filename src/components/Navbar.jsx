@@ -1,7 +1,7 @@
 import { Box, Flex, Button, DropdownMenu } from "@radix-ui/themes";
 import { Outlet, Link } from "react-router-dom";
 import { useContext } from "react";
-import { UserContext } from "../context/user.context";
+import { UserContext } from "@/context/user.context";
 import { FaUserCircle } from "react-icons/fa";
 import { logout } from "../utils/firebase";
 
