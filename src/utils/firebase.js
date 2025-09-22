@@ -8,6 +8,10 @@ import {
   setPersistence,
   browserLocalPersistence,
   signOut,
+  sendPasswordResetEmail,
+  fetchSignInMethodsForEmail,
+  verifyPasswordResetCode,
+  confirmPasswordReset,
 } from "firebase/auth";
 
 import {
@@ -110,31 +114,14 @@ export const createTutorialDocFromData = async (tutorialData) => {
   return tutorialDocRef;
 };
 
-export const fetchTutorialsByUser = async (uid) => {
-  if (!uid) return {};
-
-  const collectionRef = collection(db, "tutorials");
-  const q = query(collectionRef, where("uploaderUid", "==", uid));
-  const querySnapshot = await getDocs(q);
-
-  const tutorialsMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
-    const data = docSnapshot.data();
-    acc[docSnapshot.id] = data;
-    return acc;
-  }, {});
-
-  return tutorialsMap;
-};
-
 export const fetchTutorialsAndDocuments = async () => {
   const collectionRef = collection(db, "tutorials");
   const q = query(collectionRef);
   const querySnapshot = await getDocs(q);
-  const tutorialsMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
-    const data = docSnapshot.data();
-    acc[docSnapshot.id] = data;
-    return acc;
-  }, {});
+  const tutorialsMap = querySnapshot.docs.map((docSnapshot) => ({
+    id: docSnapshot.id,
+    ...docSnapshot.data(),
+  }));
   return tutorialsMap;
 };
 
@@ -166,21 +153,37 @@ export const incrementTutorialViews = async (tutorialId) => {
   return tutorialDocRef;
 };
 
-export const addTutorialRating = async (tutorialId, stars) => {
-  if (!tutorialId) return;
+export const hasUserReviewed = async (tutorialId, uid) => {
+  if (!tutorialId || !uid) return false;
+  const ratingRef = doc(db, "tutorials", tutorialId, "ratings", uid);
+  const snap = await getDoc(ratingRef);
+  return snap.exists();
+};
 
-  const tutorialDocRef = doc(db, "tutorials", tutorialId);
+export const addTutorialRating = async (tutorialId, uid, stars) => {
+  if (!tutorialId || !uid || !stars) return null;
 
-  try {
-    await updateDoc(tutorialDocRef, {
-      ratingsCount: increment(1),
-      ratingsSum: increment(stars),
-    });
-  } catch (error) {
-    console.log("error in rating ", error.message);
-  }
+  const ratingRef = doc(db, "tutorials", tutorialId, "ratings", uid);
+  const tutorialRef = doc(db, "tutorials", tutorialId);
 
-  return tutorialDocRef;
+  // If already reviewed, stop immediately
+  const existing = await getDoc(ratingRef);
+  if (existing.exists()) return null;
+
+  // Create user rating doc
+  await setDoc(ratingRef, {
+    uid,
+    stars,
+    createdAt: new Date(),
+  });
+
+  // Update aggregates
+  await updateDoc(tutorialRef, {
+    ratingsCount: increment(1),
+    ratingsSum: increment(stars),
+  });
+
+  return { ok: true };
 };
 
 export const createUserDocFromAuth = async (
@@ -219,4 +222,26 @@ export const createAuthUserWithEmailAndPassword = async (email, password) => {
 export const signinAuthUserWithEmailAndPassword = async (email, password) => {
   if (!email || !password) return;
   return await signInWithEmailAndPassword(auth, email, password);
+};
+
+export const resetPassword = async (email) => {
+  if (!email) return;
+  return sendPasswordResetEmail(auth, email);
+};
+
+export async function userExistsByEmail(email) {
+  const q = query(
+    collection(db, "users"),
+    where("email", "==", email.toLowerCase())
+  );
+  const snap = await getDocs(q);
+  return !snap.empty;
+}
+
+export const verifyResetCode = (oobCode) => {
+  return verifyPasswordResetCode(auth, oobCode);
+};
+
+export const confirmResetPassword = (oobCode, newPassword) => {
+  return confirmPasswordReset(auth, oobCode, newPassword);
 };

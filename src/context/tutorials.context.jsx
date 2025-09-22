@@ -1,25 +1,28 @@
 import { createContext, useState, useEffect } from "react";
 import { fetchTutorialsAndDocuments } from "../utils/firebase";
 
-export const TutorialsContext = createContext({
-  tutorials: {},
-});
+export const TutorialsContext = createContext({ tutorials: [], loading: true });
 
 export const TutorialsProvider = ({ children }) => {
-  const [tutorials, setTutorials] = useState({});
+  const [tutorials, setTutorials] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    const fetchTutorialsMap = async () => {
-      const tutorialsMap = await fetchTutorialsAndDocuments();
-      setTutorials(tutorialsMap);
-    };
-    fetchTutorialsMap();
+    (async () => {
+      setLoading(true);
+      try {
+        const data = await fetchTutorialsAndDocuments();
+        setTutorials(data);
+      } catch (err) {
+        console.error("Failed to fetch tutorials:", err);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
-  console.log(tutorials);
-  const value = { tutorials };
-
   return (
-    <TutorialsContext.Provider value={value}>
+    <TutorialsContext.Provider value={{ tutorials, loading }}>
       {children}
     </TutorialsContext.Provider>
   );

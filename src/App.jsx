@@ -9,6 +9,9 @@ import TutorialsPage from "./routes/TutorialsPage.jsx";
 import AddTutorialPage from "./routes/AddTutorialPage.jsx";
 import VerifyEmail from "./components/VerifyEmail";
 import OtpPage from "./routes/OtpPage";
+import TutorialDetailPage from "./routes/TutorialDetailPage";
+import ForgotPassword from "./routes/ForgotPassword";
+import ResetPassword from "./routes/ResetPassword";
 
 function App() {
   return (
@@ -23,10 +26,13 @@ function App() {
         <Route path="tutorials">
           <Route index element={<TutorialsPage />} />
           <Route path="new" element={<AddTutorialPage />} />
+          <Route path=":id" element={<TutorialDetailPage />} />
         </Route>
 
         <Route path="verifyemail" element={<VerifyEmail />} />
         <Route path="otp" element={<OtpPage />} />
+        <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="reset-password" element={<ResetPassword />} />
       </Route>
     </Routes>
   );

@@ -1,70 +1,52 @@
-import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { UserContext } from "../context/user.context";
-import { fetchTutorialsByUser } from "@/utils/firebase";
+import { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { UserContext } from "@/context/user.context";
+import useTutorials from "@/hooks/useTutorials";
 import TutorialCard from "@/components/TutorialCard";
-import { Button, Grid } from "@radix-ui/themes";
+import { Button, Grid, Flex, Text, Container, Heading } from "@radix-ui/themes";
 
-function TutorialsPage(props) {
+function TutorialsPage() {
   const navigate = useNavigate();
   const { currentUser } = useContext(UserContext);
-  const [tutorials, setTutorials] = useState({});
 
-  useEffect(() => {
-    if (!currentUser?.uid) return;
-
-    fetchTutorialsByUser(currentUser.uid).then(setTutorials);
-  }, [currentUser.uid]);
-
-  const data = {
-    abc123: {
-      title: "Intro to React",
-      thumbnailUrl:
-        "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800&auto=format&fit=crop",
-    },
-    def456: {
-      title: "Firebase Uploads",
-      thumbnailUrl:
-        "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800&auto=format&fit=crop",
-    },
-    ghi789: {
-      title: "Designing Clean UIs",
-      thumbnailUrl: "", // shows the placeholder
-    },
-    ghi689: {
-      title: "Designing Clean UIs",
-      thumbnailUrl: "", // shows the placeholder
-    },
-    ghi899: {
-      title: "Designing Clean UIs",
-      thumbnailUrl: "", // shows the placeholder
-    },
-  };
+  const { tutorials, loading } = useTutorials(currentUser.uid);
 
   return (
-    <div>
-      <h1>My Tutorials</h1>
-      <Button className="cursor-pointer" onClick={() => navigate("new")}>
-        Add Tutorial
-      </Button>
-      {/* render list */}
-      <Grid
-        columns="4"
-        gapX="2" // between cards in the same row
-        gapY="9" // between rows
-        mx="auto"
-        mt="8"
-        style={{ maxWidth: 1500 }}
-      >
-        {Object.entries(data).map(([id, t]) => (
-          <TutorialCard
-            key={id}
-            title={t.title}
-            thumbnailUrl={t.thumbnailUrl}
-          />
-        ))}
-      </Grid>
-    </div>
+    <Container size="5">
+      <Flex align="center" justify="between" mb="4">
+        <Heading size="6">My Tutorials</Heading>
+        <Button onClick={() => navigate("new")}>Add Tutorial</Button>
+      </Flex>
+
+      {loading ? (
+        <Text size="3">Loading data…</Text>
+      ) : tutorials.length === 0 ? (
+        <Flex direction="column" align="center" mt="9">
+          <Text size="6">No Tutorials</Text>
+        </Flex>
+      ) : (
+        <Flex justify="center">
+          <Grid
+            columns={{ initial: "1", sm: "2", md: "3", lg: "4" }}
+            gap="3"
+            width="auto"
+          >
+            {tutorials.map((t) => (
+              <Link key={t.id} to={`/tutorials/${t.id}`}>
+                <TutorialCard
+                  title={t.title}
+                  thumbnailUrl={t.thumbnailUrl}
+                  views={t.views}
+                  ratingsCount={t.ratingsCount}
+                  ratingsSum={t.ratingsSum}
+                />
+              </Link>
+            ))}
+          </Grid>
+        </Flex>
+      )}
+    </Container>
   );
 }
+
 export default TutorialsPage;

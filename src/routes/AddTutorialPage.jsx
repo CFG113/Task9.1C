@@ -5,9 +5,9 @@ import {
 } from "@/components/ui/shadcn-io/dropzone";
 import { useState, useContext } from "react";
 import { Form } from "radix-ui";
-import { Button, Text } from "@radix-ui/themes";
+import { Button, Text, Flex } from "@radix-ui/themes";
 import { useNavigate } from "react-router-dom";
-import { uploadVideo, createTutorialDocFromData, auth } from "@/utils/firebase";
+import { uploadVideo, createTutorialDocFromData } from "@/utils/firebase";
 import { UserContext } from "../context/user.context";
 import { uploadThumbnail } from "@/utils/firebase";
 
@@ -17,38 +17,44 @@ function AddTutorialPage() {
   const [files, setFiles] = useState();
   const [form, setForm] = useState({ title: "" });
   const [thumbnail, setThumbnail] = useState();
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const { title } = form;
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setForm((preValue) => {
-      return {
-        ...preValue,
-        [name]: value,
-      };
-    });
+    setForm((preValue) => ({ ...preValue, [name]: value }));
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      if (!currentUser?.uid) throw new Error("Not signed in");
+      setLoading(true);
+
+      const uid = currentUser.uid;
+
       const [videoUrl, thumbnailUrl] = await Promise.all([
-        uploadVideo(files[0]),
-        uploadThumbnail(thumbnail[0]),
+        uploadVideo(files[0], uid),
+        uploadThumbnail(thumbnail[0], uid),
       ]);
 
       await createTutorialDocFromData({
         title: title.trim(),
         videoUrl,
         thumbnailUrl,
-        uploaderUid: currentUser.uid,
+        uploaderUid: uid,
         uploaderName: currentUser.displayName,
       });
 
-      navigate("/tutorials");
+      setSuccess(true);
+      // brief confirmation, then go to /tutorials
+      setTimeout(() => navigate("/tutorials"), 700);
     } catch (err) {
       console.error("Save failed:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -125,13 +131,20 @@ function AddTutorialPage() {
               <Text color="ruby">Please add a video.</Text>
             </Form.Message>
           </Form.Field>
+
           <Button
             color="lightred"
-            disabled={!files?.length || !thumbnail?.[0]}
+            disabled={loading || !files?.length || !thumbnail?.[0]}
             className="mt-2"
           >
-            Save
+            {loading ? "Saving…" : "Save"}
           </Button>
+
+          {success && (
+            <Flex mt="2" justify="center">
+              <Text color="green">Upload successful - redirecting...</Text>
+            </Flex>
+          )}
         </Form.Root>
       </div>
     </div>

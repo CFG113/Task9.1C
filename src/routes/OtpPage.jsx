@@ -1,5 +1,13 @@
 import { useState, useEffect, useContext } from "react";
-import { Box, Card, Flex, TextField, Button, Text } from "@radix-ui/themes";
+import {
+  Box,
+  Card,
+  Flex,
+  TextField,
+  Button,
+  Text,
+  Callout,
+} from "@radix-ui/themes";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "@/context/user.context";
 import { db, auth } from "@/utils/firebase";
@@ -11,20 +19,22 @@ import {
   RecaptchaVerifier,
 } from "firebase/auth";
 
-// persist across renders without new React state
+// persist across renders
 let verificationId;
 let recaptchaVerifier;
 let autoSentOnce = false;
 
 const OtpPage = () => {
   const navigate = useNavigate();
-  const { currentUser } = useContext(UserContext);
+  const { currentUser, setCurrentUser } = useContext(UserContext);
 
   const [otp, setOtp] = useState("");
   const isSixDigits = /^\d{6}$/.test(otp);
 
-  // minimal: fetch phone from Firestore user doc
   const [phone, setPhone] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [sent, setSent] = useState("");
 
   useEffect(() => {
     if (!currentUser) return;
@@ -34,16 +44,16 @@ const OtpPage = () => {
       setPhone(number);
       if (!number || autoSentOnce) return;
 
-      // ensure recaptcha exists after DOM is mounted
       if (!recaptchaVerifier) {
         recaptchaVerifier = new RecaptchaVerifier(
           auth,
           "recaptcha-container-id",
-          { size: "invisible" }
+          {
+            size: "invisible",
+          }
         );
       }
 
-      // send SMS once
       autoSentOnce = true;
       multiFactor(currentUser)
         .getSession()
@@ -60,41 +70,57 @@ const OtpPage = () => {
         })
         .then((vid) => {
           verificationId = vid;
-          alert("SMS code sent.");
+          setSent("SMS code sent."); // <-- was notice
+          setError("");
         })
         .catch((err) => {
           console.error(err);
-          alert(err.message);
+          setError("Failed to send SMS code. Please try again.");
+          setSent("");
         });
     });
   }, [currentUser]);
 
   const handleChange = (e) => {
+    setError("");
+    setSent(""); // clear the “sent” banner on input change
     setOtp(e.target.value.replace(/\D/g, "").slice(0, 6));
   };
 
-  // verify & enroll using the code the user typed
   const handleSubmit = async () => {
+    setError("");
+    setSent("");
+    setLoading(true);
+
     if (!currentUser) {
-      alert("You must be signed in.");
-      navigate("/login");
-      return;
+      setLoading(false);
+      setError("You must be signed in.");
+      return navigate("/login");
     }
     if (!verificationId) {
-      alert("Code not sent yet.");
+      setLoading(false);
+      setError("Code not sent yet. Please request a new code.");
       return;
     }
-    if (!isSixDigits) return;
+    if (!isSixDigits) {
+      setLoading(false);
+      setError("Enter the 6-digit code.");
+      return;
+    }
 
     try {
       const cred = PhoneAuthProvider.credential(verificationId, otp);
       const assertion = PhoneMultiFactorGenerator.assertion(cred);
       await multiFactor(currentUser).enroll(assertion, phone || "My phone");
-      alert("Phone MFA enrolled successfully!");
+      await currentUser.reload();
+      setCurrentUser(currentUser);
+      setSent("Phone verified. Redirecting…"); // success message
       navigate("/");
     } catch (err) {
       console.error(err);
-      alert(err.message || "OTP verification failed.");
+      setError("Failed to verify the code. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -116,8 +142,24 @@ const OtpPage = () => {
               </Text>
             </Text>
 
-            {/* reCAPTCHA target */}
-            <div id="recaptcha-container-id" />
+            {sent && (
+              <Callout.Root color="green" role="status" aria-live="polite">
+                <Callout.Text>{sent}</Callout.Text>
+              </Callout.Root>
+            )}
+
+            {error && (
+              <Callout.Root color="red" role="alert" aria-live="assertive">
+                <Callout.Text>
+                  <Text as="span" weight="bold">
+                    Verification error:
+                  </Text>{" "}
+                  {error}
+                </Callout.Text>
+              </Callout.Root>
+            )}
+
+            <div id="recaptcha-container-id" style={{ display: "none" }}></div>
 
             <TextField.Root
               name="verificationCode"
@@ -129,13 +171,15 @@ const OtpPage = () => {
               pattern="[0-9]{6}"
               maxLength={6}
               title="Enter the 6-digit code sent to your phone"
+              disabled={loading}
             />
             <Button
               type="button"
-              disabled={!isSixDigits}
+              disabled={!isSixDigits || loading}
               onClick={handleSubmit}
+              aria-busy={loading}
             >
-              Verify
+              {loading ? "Verifying…" : "Verify"}
             </Button>
           </Flex>
         </Card>

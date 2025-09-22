@@ -1,16 +1,26 @@
 import { Box, Flex, Button, DropdownMenu } from "@radix-ui/themes";
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { UserContext } from "@/context/user.context";
 import { FaUserCircle } from "react-icons/fa";
 import { logout } from "../utils/firebase";
+import { multiFactor, PhoneMultiFactorGenerator } from "firebase/auth";
 
 function Navbar() {
+  const navigate = useNavigate();
   const { currentUser } = useContext(UserContext);
+
+  // checks if the user has used mfa
+  const hasSmsMfa =
+    !!currentUser &&
+    multiFactor(currentUser).enrolledFactors?.some(
+      (f) => f.factorId === PhoneMultiFactorGenerator.FACTOR_ID
+    );
 
   const handleLogout = async () => {
     try {
       await logout();
+      navigate("/");
     } catch (error) {
       console.error("error signing out", error);
     }
@@ -23,7 +33,7 @@ function Navbar() {
           <Link to="/">Home</Link>
           <Link to="/about">About</Link>
 
-          {currentUser ? (
+          {hasSmsMfa ? (
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <Button aria-label="User menu">
