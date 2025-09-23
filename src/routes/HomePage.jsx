@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { TutorialsContext } from "@/context/tutorials.context";
-import TutorialCard from "@/components/TutorialCard";
+import TutorialCard from "@/components/Tutorialcard";
 import { Grid, Flex, Text, Container, Heading } from "@radix-ui/themes";
 
 function HomePage() {
