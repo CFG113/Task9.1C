@@ -83,8 +83,9 @@ function Signup() {
       await sendVerificationEmail(user);
 
       navigate("/verifyemail");
-    } catch (err) {
-      setError(authErrorMessage(err));
+    } catch (error) {
+      console.log(error);
+      setError(authErrorMessage(error));
     } finally {
       setLoading(false);
     }
