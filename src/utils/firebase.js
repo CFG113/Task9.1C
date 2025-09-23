@@ -11,7 +11,6 @@ import {
   sendPasswordResetEmail,
   verifyPasswordResetCode,
   confirmPasswordReset,
-  sendEmailVerification,
 } from "firebase/auth";
 
 import {
@@ -224,17 +223,15 @@ export const signinAuthUserWithEmailAndPassword = async (email, password) => {
   return await signInWithEmailAndPassword(auth, email, password);
 };
 
-const SITE_URL = import.meta.env.VITE_SITE_URL;
 export const resetPassword = async (email) => {
   if (!email) return;
-  return sendPasswordResetEmail(auth, email, {
-    url: `${SITE_URL}/reset-password`,
-  });
+  return sendPasswordResetEmail(auth, email);
 };
 
+const SITE_URL = import.meta.env.VITE_SITE_URL;
 export const sendVerificationEmail = async (user) => {
   if (!user) return;
-  return sendEmailVerification(user);
+  return sendEmailVerification(user, { url: `${SITE_URL}/otp` });
 };
 
 export async function userExistsByEmail(email) {
