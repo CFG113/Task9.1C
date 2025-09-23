@@ -6,10 +6,11 @@ export default function Footer() {
   return (
     <Box
       asChild
+      position="fixed"
       left="0"
       right="0"
       bottom="0"
-      height="10ex"
+      height="5ex"
       style={{
         backgroundColor: "black",
         color: "white",
