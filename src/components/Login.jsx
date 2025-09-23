@@ -64,8 +64,9 @@ export default function Login() {
       const { user } = await signInWithGooglePopup();
       await createUserDocFromAuth(user);
       navigate("/");
-    } catch (err) {
-      setError(loginErrorMessage(err));
+    } catch (error) {
+      console.log(error);
+      setError(loginErrorMessage(error));
     } finally {
       setLoading(false);
     }
