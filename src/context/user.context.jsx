@@ -29,9 +29,7 @@ export const UserProvider = ({ children }) => {
     return unsubscribe;
   }, []);
 
-  if (!loading) {
-    return <div style={{ padding: 16 }}>Loading…</div>;
-  }
+  if (!loading) return null;
 
   const value = { currentUser, setCurrentUser };
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
