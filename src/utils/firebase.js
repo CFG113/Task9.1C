@@ -224,22 +224,14 @@ export const signinAuthUserWithEmailAndPassword = async (email, password) => {
   return await signInWithEmailAndPassword(auth, email, password);
 };
 
-const SITE_URL = import.meta.env.VITE_SITE_URL;
-export const resetPassword = async (email) => {
-  if (!email) return;
-  await sendPasswordResetEmail(auth, email, {
-    url: `${SITE_URL}/reset-password`,
-    handleCodeInApp: true,
-  });
-};
-
-export const sendVerificationEmail = async (user) => {
-  if (!user) return;
-  await sendEmailVerification(user, {
-    url: `${SITE_URL}/otp`,
-    handleCodeInApp: true,
-  });
-};
+await sendPasswordResetEmail(auth, email, {
+  url: "https://deakin-app-hd.netlify.app/reset-password",
+  handleCodeInApp: true,
+});
+await sendEmailVerification(user, {
+  url: "https://deakin-app-hd.netlify.app/otp",
+  handleCodeInApp: true,
+});
 
 export async function userExistsByEmail(email) {
   const q = query(
