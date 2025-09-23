@@ -11,6 +11,7 @@ import {
   sendPasswordResetEmail,
   verifyPasswordResetCode,
   confirmPasswordReset,
+  sendEmailVerification,
 } from "firebase/auth";
 
 import {
