@@ -44,7 +44,7 @@ export default function ForgotPassword() {
 
       await resetPassword(trimmed);
       console.log("reset email sent");
-      setSent("Password reset email sent. Check your inbox.");
+      setSent("Password reset email sent. Check your inbox or spam folder.");
     } catch (error) {
       console.error(error);
       setError("Failed to send reset email. Please try again.");
