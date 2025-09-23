@@ -18,7 +18,7 @@ export default function Footer() {
       }}
     >
       <footer>
-        <Flex align="center" height="100%" px="5">
+        <Flex align="center" justify="between" height="100%" px="5">
           <Box flexShrink="0">
             <Link to="/about">About Deakin</Link>
           </Box>
