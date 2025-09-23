@@ -11,7 +11,6 @@ import VerifyEmail from "./components/VerifyEmail";
 import OtpPage from "./routes/OtpPage";
 import TutorialDetailPage from "./routes/TutorialDetailPage";
 import ForgotPassword from "./routes/ForgotPassword";
-import ResetPassword from "./routes/ResetPassword";
 
 function App() {
   return (
@@ -32,7 +31,6 @@ function App() {
         <Route path="verifyemail" element={<VerifyEmail />} />
         <Route path="otp" element={<OtpPage />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
-        <Route path="reset-password" element={<ResetPassword />} />
       </Route>
     </Routes>
   );
