@@ -14,7 +14,7 @@ export default function Footer() {
       style={{
         backgroundColor: "black",
         color: "white",
-        fontSize: "calc(8px + 2vmin)",
+        fontSize: "calc(5px + 2vmin)",
       }}
     >
       <footer>
