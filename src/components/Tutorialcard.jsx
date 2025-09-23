@@ -6,6 +6,7 @@ function TutorialCard(props) {
   const { title, thumbnailUrl, views, ratingsCount, ratingsSum } = props;
 
   const avg = ratingsSum / ratingsCount;
+  const safeAvg = avg > 0 ? avg.toFixed(1) : 0;
 
   return (
     <Card size="2" variant="surface" style={{ width: 260 }}>
@@ -33,7 +34,7 @@ function TutorialCard(props) {
             <FaStar />
           </Text>
           <Text size="1" color="gray">
-            {avg.toFixed(1)} ({ratingsCount})
+            {safeAvg} ({ratingsCount})
           </Text>
         </Flex>
 
