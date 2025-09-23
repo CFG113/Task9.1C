@@ -227,14 +227,18 @@ export const signinAuthUserWithEmailAndPassword = async (email, password) => {
 const SITE_URL = import.meta.env.VITE_SITE_URL;
 export const resetPassword = async (email) => {
   if (!email) return;
-  return sendPasswordResetEmail(auth, email, {
+  await sendPasswordResetEmail(auth, email, {
     url: `${SITE_URL}/reset-password`,
+    handleCodeInApp: true,
   });
 };
 
 export const sendVerificationEmail = async (user) => {
   if (!user) return;
-  return sendEmailVerification(user, { url: `${SITE_URL}/otp` });
+  await sendEmailVerification(user, {
+    url: `${SITE_URL}/otp`,
+    handleCodeInApp: true,
+  });
 };
 
 export async function userExistsByEmail(email) {
