@@ -143,10 +143,12 @@ export default function Login() {
           setMfaStatus("");
           navigate("/");
         } catch (error) {
+          console.log(error);
           setMfaStatus("");
           setError(loginErrorMessage(error));
         }
       } else {
+        console.log(error);
         setError(loginErrorMessage(error));
       }
     } finally {
