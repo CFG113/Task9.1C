@@ -18,11 +18,16 @@ export default function Footer() {
       }}
     >
       <footer>
-        <Flex align="center" justify="between" p="5">
-          <Link to="/about">About Deakin</Link>
-          <Link to="/connect">Connect with us</Link>
+        <Flex align="center" height="100%" px="5">
+          <Box flexShrink="0">
+            <Link to="/about">About Deakin</Link>
+          </Box>
 
-          <Flex align="center" gap="3">
+          <Flex grow="1" justify="center">
+            Connect with us
+          </Flex>
+
+          <Flex align="center" gap="3" flexShrink="0">
             <a href="https://www.facebook.com/DeakinUniversity">
               <FaFacebook />
             </a>
