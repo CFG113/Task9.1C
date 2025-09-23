@@ -34,7 +34,6 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // MFA UX banners
   const [mfaStatus, setMfaStatus] = useState("");
 
   // Invisible reCAPTCHA instance

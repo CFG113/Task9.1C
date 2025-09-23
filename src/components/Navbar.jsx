@@ -10,12 +10,18 @@ function Navbar() {
   const navigate = useNavigate();
   const { currentUser } = useContext(UserContext);
 
-  // checks if the user has used mfa
+  // checks if the user has used mfa or google sign in
+  const isGoogleUser =
+    !!currentUser &&
+    currentUser.providerData?.some((p) => p?.providerId === "google.com");
+
   const hasSmsMfa =
     !!currentUser &&
     multiFactor(currentUser).enrolledFactors?.some(
       (f) => f.factorId === PhoneMultiFactorGenerator.FACTOR_ID
     );
+
+  const isSignedIn = isGoogleUser || hasSmsMfa;
 
   const handleLogout = async () => {
     try {
@@ -33,7 +39,7 @@ function Navbar() {
           <Link to="/">Home</Link>
           <Link to="/about">About</Link>
 
-          {hasSmsMfa ? (
+          {isSignedIn ? (
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <Button aria-label="User menu">
