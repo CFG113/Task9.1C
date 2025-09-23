@@ -36,7 +36,7 @@ export default function Login() {
 
   const [mfaStatus, setMfaStatus] = useState("");
 
-  // Invisible reCAPTCHA instance
+  // reCAPTCHA instance
   const recaptchaRef = useRef(null);
 
   useEffect(() => {

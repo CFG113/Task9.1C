@@ -6,7 +6,6 @@ export default function Footer() {
   return (
     <Box
       asChild
-      position="fixed"
       left="0"
       right="0"
       bottom="0"
