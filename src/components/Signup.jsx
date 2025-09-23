@@ -11,9 +11,10 @@ import {
 import {
   createUserDocFromAuth,
   createAuthUserWithEmailAndPassword,
+  sendVerificationEmail,
 } from "@/utils/firebase";
 import { useContext, useState } from "react";
-import { sendEmailVerification, updateProfile } from "firebase/auth";
+import { updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "@/context/user.context";
 import {
@@ -79,9 +80,7 @@ function Signup() {
       await updateProfile(user, { displayName });
       await createUserDocFromAuth(user, { displayName, phoneNumber });
 
-      await sendEmailVerification(user, {
-        url: `${window.location.origin}/otp`,
-      });
+      await sendVerificationEmail(user);
 
       navigate("/verifyemail");
     } catch (err) {
