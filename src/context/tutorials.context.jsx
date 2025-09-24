@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from "react";
-import { fetchTutorialsAndDocuments } from "../utils/firebase";
+import { onSnapshot } from "firebase/firestore";
+import { fetchTutorialsAndDocuments } from "@/utils/firebase";
 
 export const TutorialsContext = createContext({ tutorials: [], loading: true });
 
@@ -8,17 +9,22 @@ export const TutorialsProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
-      setLoading(true);
-      try {
-        const data = await fetchTutorialsAndDocuments();
-        setTutorials(data);
-      } catch (err) {
-        console.error("Failed to fetch tutorials:", err);
-      } finally {
+    const queryRef = fetchTutorialsAndDocuments();
+
+    const unsubscribe = onSnapshot(
+      queryRef,
+      (snapshot) => {
+        setTutorials(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+        setLoading(false);
+      },
+      (error) => {
+        console.error("tutorials realtime error:", error);
+        setTutorials([]);
         setLoading(false);
       }
-    })();
+    );
+
+    return () => unsubscribe();
   }, []);
 
   return (

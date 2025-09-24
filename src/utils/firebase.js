@@ -114,15 +114,10 @@ export const createTutorialDocFromData = async (tutorialData) => {
   return tutorialDocRef;
 };
 
-export const fetchTutorialsAndDocuments = async () => {
+export const fetchTutorialsAndDocuments = () => {
   const collectionRef = collection(db, "tutorials");
-  const q = query(collectionRef);
-  const querySnapshot = await getDocs(q);
-  const tutorialsMap = querySnapshot.docs.map((docSnapshot) => ({
-    id: docSnapshot.id,
-    ...docSnapshot.data(),
-  }));
-  return tutorialsMap;
+  const q = query(collectionRef, orderBy("createdAt", "desc"));
+  return q;
 };
 
 export const deleteTutorialDocById = async (tutorialId) => {

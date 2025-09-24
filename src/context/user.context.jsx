@@ -3,6 +3,7 @@ import UserReducer from "../reducers/UserReducer";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../utils/firebase";
 
+// Stores the state of the user so any component can get the user wihtout prop drilling
 export const UserContext = createContext({
   currentUser: null,
   setCurrentUser: () => null,
@@ -14,7 +15,7 @@ const INITIAL_STATE = {
 
 export const UserProvider = ({ children }) => {
   // const [currentUser, setCurrentUser] = useState(null);
-  const [{ currentUser }, dispatch] = useReducer(UserReducer, INITIAL_STATE);
+  const [{ currentUser }, dispatch] = useReducer(UserReducer, INITIAL_STATE); // Managing the auth state transitions
   const [loading, setLoading] = useState(false);
 
   const setCurrentUser = (user) => {

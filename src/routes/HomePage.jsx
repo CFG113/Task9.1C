@@ -1,11 +1,10 @@
 import { useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { TutorialsContext } from "@/context/tutorials.context";
 import TutorialCard from "@/components/Tutorialcard";
 import { Grid, Flex, Text, Container, Heading } from "@radix-ui/themes";
 
 function HomePage() {
-  const navigate = useNavigate();
   const { tutorials, loading } = useContext(TutorialsContext);
 
   return (
